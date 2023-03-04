@@ -2,33 +2,31 @@
 {
     public class RegisterUser
     {
-        public RegisterUser(long id, string email, string? name, string? status, string? linkedin, string? github)
+
+/*        public RegisterUser(long Id, string email, string password, string? name)
         {
-            Id = id;
+            Id = Id;
             Email = email;
+            Password = password;
             Name = name;
-            Status = status;
+        }
+
+
+        public RegisterUser(long Id, string email, string password, string? name, string? linkedin, string? github)
+        {
+            Id
+            Email = email;
+            Password = password;
+            Name = name;
             Linkedin = linkedin;
             Github = github;
         }
-
-        public RegisterUser(long id, string email, string? name, string? status, string? linkedin, string? github, List<Codex>? codexes)
-        {
-            Id = id;
-            Email = email;
-            Name = name;
-            Status = status;
-            Linkedin = linkedin;
-            Github = github;
-            Codexes = codexes;
-        }
-
+*/
         public long Id { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }
         public string? Name { get; set; }
-        public string? Status { get; set; }
         public string? Linkedin { get; set; }
         public string? Github { get; set; }
-        public List<Codex>? Codexes { get; set; }
     }
 }

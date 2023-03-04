@@ -126,9 +126,9 @@ namespace codeallot.Controllers
 
 
         [HttpPost("Register")]
-        public async Task<ActionResult<RegisterUser>> Register(RegisterUser user, string password)
+        public async Task<ActionResult<RegisterUser>> Register(RegisterUser user)
         {
-            if (password == null || user.Email == null || user.Name == null)
+            if (user.Password == null || user.Email == null || user.Name == null)
             {
                 return BadRequest($"Email, Name & Password Are Required...!");
             }
@@ -144,9 +144,9 @@ namespace codeallot.Controllers
                 return BadRequest($"User with email {user.Email} already exists...!");
             }
 
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
-            var newUser = new User(user.Id, user.Email, user.Name, user.Status, user.Linkedin, user.Github, passwordHash);
+            var newUser = new User(user.Id, user.Email, user.Name, user.Linkedin, user.Github, passwordHash);
 
             var getToken = CreateToken(newUser);
             newUser.Token = getToken;
@@ -154,7 +154,8 @@ namespace codeallot.Controllers
             await _context.SaveChangesAsync();
 
             UserLCDTO userLC = new UserLCDTO();
-            userLC.registerUser = new RegisterUser(newUser.Id, newUser.Email, newUser.Name, newUser.Status, newUser.Linkedin, newUser.Github);
+
+            userLC.registerUser = new RegisterUser { Id = newUser.Id, Email = newUser.Email, Password = user.Password, Name = newUser.Name, Linkedin = newUser.Linkedin, Github = newUser.Github };
             userLC.token = getToken;
 
             return Ok(userLC);
