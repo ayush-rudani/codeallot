@@ -161,7 +161,8 @@ namespace codeallot.Controllers
             return Ok(userLC);
         }
 
-        []
+       // [HttpPost("login")]
+        //public async Task<IActionResult> Login()
 
 
         private string CreateToken(User user)
