@@ -161,8 +161,23 @@ namespace codeallot.Controllers
             return Ok(userLC);
         }
 
-       // [HttpPost("login")]
-        //public async Task<IActionResult> Login()
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserLogin userLogin)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
+            if (user is null)
+                return NotFound();
+            else if (!BCrypt.Net.BCrypt.Verify(userLogin.Password, user.PasswordHash))
+                return BadRequest("Wrong password!!");
+            else
+            {
+                UserLCDTO userLC = new UserLCDTO();
+                userLC.registerUser = new RegisterUser { Id = user.Id, Email = user.Email, Password = user.PasswordHash, Name = user.Name, Linkedin = user.Linkedin, Github = user.Github };
+                userLC.token = CreateToken(user);
+
+                return Ok(userLC);
+            }
+        }
 
 
         private string CreateToken(User user)
