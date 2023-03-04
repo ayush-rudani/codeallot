@@ -12,16 +12,16 @@ namespace codeallot.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CodicesController : ControllerBase
+    public class CodexController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public CodicesController(DataContext context)
+        public CodexController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: api/Codices
+        // GET: api/Codex
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Codex>>> GetCodexes()
         {
@@ -32,7 +32,7 @@ namespace codeallot.Controllers
             return await _context.Codexes.ToListAsync();
         }
 
-        // GET: api/Codices/5
+        // GET: api/Codex/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Codex>> GetCodex(long id)
         {
@@ -50,7 +50,7 @@ namespace codeallot.Controllers
             return codex;
         }
 
-        // PUT: api/Codices/5
+        // PUT: api/Codex/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCodex(long id, Codex codex)
@@ -81,7 +81,7 @@ namespace codeallot.Controllers
             return NoContent();
         }
 
-        // POST: api/Codices
+        // POST: api/Codex
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Codex>> PostCodex(Codex codex)
@@ -96,7 +96,7 @@ namespace codeallot.Controllers
             return CreatedAtAction("GetCodex", new { id = codex.Id }, codex);
         }
 
-        // DELETE: api/Codices/5
+        // DELETE: api/Codex/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCodex(long id)
         {

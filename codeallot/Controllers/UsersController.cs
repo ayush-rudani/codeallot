@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using codeallot.Data;
 using codeallot.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Azure.Core;
 
 namespace codeallot.Controllers
 {
@@ -15,10 +20,12 @@ namespace codeallot.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly DataContext _context;
+        private IConfiguration _configuration;
+        private DataContext _context;
 
-        public UsersController(DataContext context)
+        public UsersController(DataContext context, IConfiguration configuration)
         {
+            _configuration = configuration;
             _context = context;
         }
 
@@ -118,8 +125,8 @@ namespace codeallot.Controllers
         }
 
 
-        /*[HttpPost("Register")]
-        public async Task<ActionResult<UserDto>> Register(UserDto user, string password)
+        [HttpPost("Register")]
+        public async Task<ActionResult<RegisterUser>> Register(RegisterUser user, string password)
         {
             if (password == null || user.Email == null || user.Name == null)
             {
@@ -129,7 +136,7 @@ namespace codeallot.Controllers
             {
                 return Problem("Entity set 'DataContext.Users'  is null.");
             }
-            
+
             var userExists = await UserExists(user.Email);
 
             if (userExists)
@@ -139,7 +146,40 @@ namespace codeallot.Controllers
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        }*/
+            var newUser = new User(user.Id, user.Email, user.Name, user.Status, user.Linkedin, user.Github, passwordHash);
+
+            var getToken = CreateToken(newUser);
+            newUser.Token = getToken;
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            UserLCDTO userLC = new UserLCDTO();
+            userLC.registerUser = new RegisterUser(newUser.Id, newUser.Email, newUser.Name, newUser.Status, newUser.Linkedin, newUser.Github);
+            userLC.token = getToken;
+
+            return Ok(userLC);
+        }
+
+
+        private string CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Email)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(claims: claims, expires: DateTime.Now.AddDays(1), signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+
+        }
 
         private bool UserExists(long id)
         {
