@@ -118,7 +118,7 @@ namespace codeallot.Controllers
         }
 
 
-        [HttpPost("Register")]
+        /*[HttpPost("Register")]
         public async Task<ActionResult<UserDto>> Register(UserDto user, string password)
         {
             if (password == null || user.Email == null || user.Name == null)
@@ -139,7 +139,7 @@ namespace codeallot.Controllers
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
 
-        }
+        }*/
 
         private bool UserExists(long id)
         {
