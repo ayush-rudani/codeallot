@@ -31,7 +31,7 @@
         public string? Linkedin { get; set; }
         public string? Github { get; set; }
         public List<Codex>? Codexes { get; set; }
-        public string? CodexCount { get; set; }
+        public int? CodexCount { get; set; }
 
         public string PasswordHash { get; set; }
 

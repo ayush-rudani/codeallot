@@ -25,10 +25,10 @@ namespace codeallot.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Codex>>> GetCodexes()
         {
-          if (_context.Codexes == null)
-          {
-              return NotFound();
-          }
+            if (_context.Codexes == null)
+            {
+                return NotFound();
+            }
             return await _context.Codexes.ToListAsync();
         }
 
@@ -36,10 +36,10 @@ namespace codeallot.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Codex>> GetCodex(long id)
         {
-          if (_context.Codexes == null)
-          {
-              return NotFound();
-          }
+            if (_context.Codexes == null)
+            {
+                return NotFound();
+            }
             var codex = await _context.Codexes.FindAsync(id);
 
             if (codex == null)
@@ -84,16 +84,48 @@ namespace codeallot.Controllers
         // POST: api/Codex
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Codex>> PostCodex(Codex codex)
+        public async Task<ActionResult<Codex>> PostCodex(CreateCodex req)
         {
-          if (_context.Codexes == null)
-          {
-              return Problem("Entity set 'DataContext.Codexes'  is null.");
-          }
-            _context.Codexes.Add(codex);
+            if (_context.Codexes == null)
+            {
+                return Problem("Entity set 'DataContext.Codexes'  is null.");
+            }
+            if (req.userid == 0)
+            {
+                return Problem("Userid is null.");
+            }
+
+            var user = await _context.Users.FindAsync(req.userid);
+
+            var newCodex = new Codex
+            {
+                Title = req.Title,
+                Filename = req.Filename,
+                Description = req.Description,
+                Content = req.Content,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                CreatedBy = user,
+            };
+
+            if (user.CodexCount is null || user.CodexCount == 0)
+            {
+                user.CodexCount = 1;
+                user.Codexes = new List<Codex> { newCodex };
+            }
+            else
+            {
+                user.CodexCount += 1;
+                //user.Codexes.Add(newCodex);
+            }
+
+
+            _context.Codexes.Add(newCodex);
+            _context.Users.Update(user);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCodex", new { id = codex.Id }, codex);
+            return CreatedAtAction("GetCodex", newCodex.Id);
         }
 
         // DELETE: api/Codex/5
@@ -113,7 +145,7 @@ namespace codeallot.Controllers
             _context.Codexes.Remove(codex);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Codex deleted.");
         }
 
         private bool CodexExists(long id)
