@@ -169,6 +169,7 @@ namespace codeallot.Controllers
                 return NotFound();
             else if (!BCrypt.Net.BCrypt.Verify(userLogin.Password, user.PasswordHash))
                 return BadRequest("Wrong password!!");
+            
             else
             {
                 UserLCDTO userLC = new UserLCDTO();
