@@ -30,6 +30,7 @@ namespace codeallot.Controllers
                 return NotFound();
             }
             return await _context.Codexes.ToListAsync();
+            //return await _context.Codexes.Include(c => ).ToListAsync();
         }
 
         // GET: api/Codex/5
@@ -40,8 +41,8 @@ namespace codeallot.Controllers
             {
                 return NotFound();
             }
-            var codex = await _context.Codexes.FindAsync(id);
-
+            //var codex = await _context.Codexes.FindAsync(id);
+            var codex = await _context.Codexes.FirstOrDefaultAsync(c => c.Id == id);
             if (codex == null)
             {
                 return NotFound();
@@ -105,7 +106,7 @@ namespace codeallot.Controllers
                 Content = req.Content,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                CreatedBy = user,
+                UserName = user.Name,
             };
 
             if (user.CodexCount is null || user.CodexCount == 0)
