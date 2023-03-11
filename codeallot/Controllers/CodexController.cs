@@ -85,12 +85,13 @@ namespace codeallot.Controllers
         // POST: api/Codex
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Codex>> PostCodex(CreateCodex req)
+        public async Task<ActionResult<Codex>> PostCodex([FromForm]CreateCodex req)
         {
             if (_context.Codexes == null)
             {
                 return Problem("Entity set 'DataContext.Codexes'  is null.");
             }
+            //System.Console.WriteLine("req: " + req.Description);
             if (req.userid == 0)
             {
                 return Problem("Userid is null.");
@@ -126,7 +127,32 @@ namespace codeallot.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCodex", newCodex.Id);
+            return Ok(newCodex);
+            //return CreatedAtAction("GetCodex", newCodex.Id);
+        }
+
+        [HttpGet("c/{uid}")]
+        public async Task<IActionResult> GetCodexbyUser(long uid)
+        {
+            {
+                if (_context.Codexes == null)
+                {
+                    return NotFound();
+                }
+                if (uid == 0)
+                {
+                    return Problem("Userid is null.");
+                }
+
+                var user = await _context.Users.FindAsync(uid);
+
+                if (user == null)
+                    return NotFound();
+
+                var codexes = await _context.Codexes.Where(c => c.UserName == user.Name).ToListAsync();
+
+                return Ok(codexes);
+            }
         }
 
         // DELETE: api/Codex/5
@@ -149,6 +175,9 @@ namespace codeallot.Controllers
             return Ok("Codex deleted.");
         }
 
+        
+
+        
         private bool CodexExists(long id)
         {
             return (_context.Codexes?.Any(e => e.Id == id)).GetValueOrDefault();
