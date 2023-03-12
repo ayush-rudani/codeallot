@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using codeallot.Data;
 using codeallot.Models;
+using System.Security.Cryptography;
 
 namespace codeallot.Controllers
 {
@@ -82,10 +83,12 @@ namespace codeallot.Controllers
             return NoContent();
         }
 
+
+
         // POST: api/Codex
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Codex>> PostCodex([FromForm]CreateCodex req)
+        public async Task<ActionResult<Codex>> PostCodex([FromForm] CreateCodex req)
         {
             if (_context.Codexes == null)
             {
@@ -163,21 +166,30 @@ namespace codeallot.Controllers
             {
                 return NotFound();
             }
+
             var codex = await _context.Codexes.FindAsync(id);
+            var user = await _context.Users.Where(u => u.Name == codex.UserName).FirstOrDefaultAsync();
+
+            user.CodexCount -= 1;
+
             if (codex == null)
             {
                 return NotFound();
             }
 
+            
             _context.Codexes.Remove(codex);
+            _context.Users.Update(user);
+            
+            
             await _context.SaveChangesAsync();
 
             return Ok("Codex deleted.");
         }
 
-        
 
-        
+
+
         private bool CodexExists(long id)
         {
             return (_context.Codexes?.Any(e => e.Id == id)).GetValueOrDefault();
