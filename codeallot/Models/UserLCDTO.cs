@@ -5,7 +5,5 @@
     {
         public RegisterUser? registerUser { get; set; }
         public string? token { get; set; }
-        
-    
     }
 }
